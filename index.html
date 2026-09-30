@@ -271,6 +271,25 @@ body{
   color:#167d77;
 }
 </style>
+
+<style id="sticky-filter-bar">
+/* Filter tetap menempel di bagian atas saat halaman di-scroll */
+.controls{
+  position:sticky !important;
+  top:78px !important;
+  z-index:950 !important;
+  margin-top:0 !important;
+  backdrop-filter:blur(14px);
+  background:rgba(255,255,255,.96) !important;
+  box-shadow:0 8px 24px rgba(18,59,86,.10) !important;
+}
+@media(max-width:900px){
+  .controls{
+    top:0 !important;
+    z-index:1500 !important;
+  }
+}
+</style>
 </head>
 <body>
 <aside class="side-nav" id="sideNav">
