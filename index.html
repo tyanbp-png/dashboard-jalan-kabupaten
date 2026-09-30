@@ -416,7 +416,7 @@ body{
 #streetViewClose{background:#fff;color:#123b56;border:0;padding:7px 10px;border-radius:7px;cursor:pointer;font-weight:700}
 #streetView{height:420px;background:#e9eef2;position:relative}
 #streetView iframe{width:100%;height:100%;border:0}
-.sv-btn{display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:8px 11px;border:0;border-radius:7px;background:#123b56;color:#fff;font-weight:700;cursor:pointer}
+.sv-btn{position:relative;z-index:9999;pointer-events:auto;display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:8px 11px;border:0;border-radius:7px;background:#123b56;color:#fff;font-weight:700;cursor:pointer}
 .sv-btn:hover{background:#0d3045}
 .gm-info-table{width:100%;min-width:0;border-collapse:collapse;font-size:12px}
 .gm-info-table td{padding:5px 6px;border-bottom:1px solid #e5e7eb;vertical-align:top}
@@ -574,6 +574,17 @@ window.showStreetViewForRoad=function(noRuas){
   }
   showStreetLevel(center[0],center[1],x.nama||x.no_ruas);
 };
+
+// Use event delegation instead of inline onclick so the button remains clickable
+// inside Leaflet popup content across browsers.
+document.addEventListener('click', function(e){
+  const btn=e.target.closest && e.target.closest('.sv-road-btn');
+  if(!btn) return;
+  e.preventDefault();
+  e.stopPropagation();
+  const noRuas=btn.getAttribute('data-no-ruas');
+  if(noRuas) window.showStreetViewForRoad(noRuas);
+}, true);
 function popupHtml(x,latlng){
   return `<div class="ruas-popup" style="min-width:300px;max-width:390px">
     <div style="font-size:11px;color:#6b7280">NO. RUAS ${esc(x.no_ruas)}</div>
@@ -604,7 +615,7 @@ function popupHtml(x,latlng){
         <tr><td>Anggaran Rusak Berat</td><td>${fmtRp(x.anggaran_rb)}</td></tr>
       </table>
     </div>
-    <button class="sv-btn" onclick="showStreetViewForRoad(${JSON.stringify(String(x.no_ruas))})">📷 Lihat Street-Level</button>
+    <button type="button" class="sv-btn sv-road-btn" data-no-ruas="${esc(String(x.no_ruas))}">📷 Lihat Street-Level</button>
   </div>`;
 }
 function clearRoutes(){routeLayers.forEach(x=>map.removeLayer(x));routeLayers=[];}
