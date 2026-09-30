@@ -406,6 +406,17 @@ body{
   border-bottom:1px solid #cbdde7 !important;
 }
 </style>
+<style id="popup-google-maps-choice">
+.popup-actions{margin-top:12px;padding-top:10px;border-top:1px solid #e5e7eb}
+.popup-gmaps-btn{
+  width:100%;border:0;border-radius:10px;padding:10px 14px;
+  background:linear-gradient(135deg,#1769aa,#2f7ed8);color:#fff;
+  font-size:14px;font-weight:700;cursor:pointer;
+  box-shadow:0 3px 10px rgba(20,70,110,.18);
+}
+.popup-gmaps-btn:hover{filter:brightness(1.05)}
+.popup-gmaps-btn:active{transform:translateY(1px)}
+</style>
 </head>
 <body>
 <aside class="side-nav" id="sideNav">
@@ -442,7 +453,7 @@ body{
 <button onclick="resetF()">Reset</button>
 </div>
 <div class="kpis"><div class="kpi"><small>Jumlah Ruas</small><b id="n">0</b></div><div class="kpi"><small>Panjang</small><b id="p">0 km</b></div><div class="kpi"><small>Kondisi Baik</small><b id="b">0 km</b></div><div class="kpi"><small>Rusak Ringan + Berat</small><b id="r">0 km</b></div></div>
-<div class="grid"><section class="card map-card" id="map-section"><h3>Peta Trase Jalan</h3><div style="position:relative"><div id="map"></div><div class="map-info">Arahkan kursor ke trase untuk nama ruas • Klik trase untuk buka Google Maps</div></div><small id="status"></small></section><section class="card condition-card" id="condition-section"><h3>Komposisi Kondisi</h3><div class="chart"><canvas id="ch"></canvas></div></section></div>
+<div class="grid"><section class="card map-card" id="map-section"><h3>Peta Trase Jalan</h3><div style="position:relative"><div id="map"></div><div class="map-info">Arahkan kursor ke trase untuk nama ruas • Klik trase untuk melihat detail & pilihan</div></div><small id="status"></small></section><section class="card condition-card" id="condition-section"><h3>Komposisi Kondisi</h3><div class="chart"><canvas id="ch"></canvas></div></section></div>
 <section class="card roads-card" id="roads-section" style="margin-top:10px"><h3>Daftar Ruas</h3><div class="table">
 <div class="table-scroll-tools" aria-label="Geser tabel">
   <button type="button" id="tableScrollLeft" title="Geser ke kiri">‹</button>
@@ -590,19 +601,6 @@ function render(){
             l.closeTooltip();
           });
 
-          // Klik pertama pada trase langsung membuka Google Maps
-          // pada titik koordinat yang diklik, tanpa API key.
-          l.on('click',(e)=>{
-            if(e && e.originalEvent){
-              e.originalEvent.preventDefault();
-              e.originalEvent.stopPropagation();
-            }
-            const lat=Number(e.latlng.lat).toFixed(6);
-            const lng=Number(e.latlng.lng).toFixed(6);
-            const url='https://www.google.com/maps/search/?api=1&query='+lat+','+lng;
-            window.open(url,'_blank','noopener,noreferrer');
-          });
-
           let perkerasan=[];
           if(x.hotmix>0) perkerasan.push(`Hotmix ${x.hotmix.toFixed(2)} km`);
           if(x.lapen>0) perkerasan.push(`Lapen/Makadam ${x.lapen.toFixed(2)} km`);
@@ -642,6 +640,15 @@ function render(){
                   <tr><td>Anggaran Rusak Berat</td><td>${x.anggaran_rb ? 'Rp '+Number(x.anggaran_rb).toLocaleString('id-ID') : '-'}</td></tr>
                 </table>
               </div>
+
+              <div class="popup-actions">
+                <button type="button"
+                        class="popup-gmaps-btn"
+                        data-map-lat="${Number((featureGroups(f.geometry)[0]||[])[0]?.[0] || map.getCenter().lat).toFixed(6)}"
+                        data-map-lng="${Number((featureGroups(f.geometry)[0]||[])[0]?.[1] || map.getCenter().lng).toFixed(6)}">
+                  📍 Buka Google Maps
+                </button>
+              </div>
             </div>`);
         }
       }
@@ -652,7 +659,7 @@ function render(){
     map.fitBounds(layer.getBounds(),{padding:[15,15],maxZoom:14});
   }
 
-  document.getElementById('status').textContent=`${rs.length} ruas | ${feats.length} trase tersedia • Klik trase untuk membuka Google Maps • Data PKRMS 2026`;
+  document.getElementById('status').textContent=`${rs.length} ruas | ${feats.length} trase tersedia • Klik trase untuk melihat detail & pilihan • Data PKRMS 2026`;
 
   if(chart) chart.destroy();
   chart=new Chart(document.getElementById('ch'),{
@@ -732,6 +739,19 @@ c.onchange=render;
 q.oninput=render;
 updateRoadList();
 render();
+</script>
+<script id="google-maps-choice-handler">
+document.addEventListener('click', function(e){
+  const btn=e.target.closest && e.target.closest('.popup-gmaps-btn');
+  if(!btn) return;
+  e.preventDefault();
+  e.stopPropagation();
+  const lat=btn.getAttribute('data-map-lat');
+  const lng=btn.getAttribute('data-map-lng');
+  if(!lat || !lng) return;
+  const url='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(lat+','+lng);
+  window.open(url,'_blank','noopener,noreferrer');
+}, true);
 </script>
 <script id="sidebar-navigation">
 (function(){
