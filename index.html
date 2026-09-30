@@ -214,6 +214,63 @@ body{
 }
 @media(max-width:520px){.top-header h1{font-size:17px!important}.top-header p{font-size:10px}.top-header .eyebrow{font-size:8px}}
 </style>
+
+<style id="horizontal-table-scroll">
+/* Scroll horizontal untuk tabel Daftar Ruas */
+#roads-section .table-wrap,
+.roads-card .table-wrap{
+  overflow-x:auto !important;
+  overflow-y:auto !important;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:auto;
+  scrollbar-color:#8aa8ba #eaf2f7;
+  scrollbar-gutter:stable;
+}
+#roads-section .table-wrap::-webkit-scrollbar,
+.roads-card .table-wrap::-webkit-scrollbar{
+  width:12px;
+  height:14px;
+}
+#roads-section .table-wrap::-webkit-scrollbar-track,
+.roads-card .table-wrap::-webkit-scrollbar-track{
+  background:#eaf2f7;
+  border-radius:10px;
+}
+#roads-section .table-wrap::-webkit-scrollbar-thumb,
+.roads-card .table-wrap::-webkit-scrollbar-thumb{
+  background:#8aa8ba;
+  border:3px solid #eaf2f7;
+  border-radius:10px;
+}
+#roads-section .table-wrap::-webkit-scrollbar-thumb:hover,
+.roads-card .table-wrap::-webkit-scrollbar-thumb:hover{
+  background:#55788e;
+}
+/* Tombol geser kiri/kanan agar mudah dipakai */
+.table-scroll-tools{
+  display:flex;
+  justify-content:flex-end;
+  gap:6px;
+  margin:-2px 0 8px;
+}
+.table-scroll-tools button{
+  width:34px;
+  height:30px;
+  border:1px solid #d5e4ec;
+  border-radius:8px;
+  background:#fff;
+  color:#24485d;
+  font-size:18px;
+  font-weight:800;
+  cursor:pointer;
+  box-shadow:0 2px 7px rgba(20,60,85,.07);
+}
+.table-scroll-tools button:hover{
+  background:#edf7f7;
+  border-color:#9ed7d0;
+  color:#167d77;
+}
+</style>
 </head>
 <body>
 <aside class="side-nav" id="sideNav">
@@ -230,7 +287,7 @@ body{
   </nav>
   <div class="side-footer">
     <div class="side-status"><span></span> Data aktif</div>
-    <small>Dashboard Kondisi Ruas Jalan</small>
+    <small>Dashboard Kondisi Ruas Jalan<br><strong>(tyanbpTA2026)</strong></small>
   </div>
 </aside>
 <button class="mobile-menu" id="mobileMenu" aria-label="Buka menu">☰</button>
@@ -251,7 +308,12 @@ body{
 </div>
 <div class="kpis"><div class="kpi"><small>Jumlah Ruas</small><b id="n">0</b></div><div class="kpi"><small>Panjang</small><b id="p">0 km</b></div><div class="kpi"><small>Kondisi Baik</small><b id="b">0 km</b></div><div class="kpi"><small>Rusak Ringan + Berat</small><b id="r">0 km</b></div></div>
 <div class="grid"><section class="card map-card" id="map-section"><h3>Peta Trase Jalan</h3><div style="position:relative"><div id="map"></div><div class="map-info">Arahkan kursor ke trase untuk nama ruas • Klik untuk detail</div></div><small id="status"></small></section><section class="card condition-card" id="condition-section"><h3>Komposisi Kondisi</h3><div class="chart"><canvas id="ch"></canvas></div></section></div>
-<section class="card roads-card" id="roads-section" style="margin-top:10px"><h3>Daftar Ruas</h3><div class="table"><div class="table-wrap"><table class="excel-table">
+<section class="card roads-card" id="roads-section" style="margin-top:10px"><h3>Daftar Ruas</h3><div class="table">
+<div class="table-scroll-tools" aria-label="Geser tabel">
+  <button type="button" id="tableScrollLeft" title="Geser ke kiri">‹</button>
+  <button type="button" id="tableScrollRight" title="Geser ke kanan">›</button>
+</div>
+<div class="table-wrap"><table class="excel-table">
 <thead>
 <tr>
 <th rowspan="3">NO</th>
@@ -530,6 +592,21 @@ render();
     const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){const id='#'+e.target.id;items.forEach(x=>x.classList.toggle('active',x.getAttribute('href')===id));}}),{rootMargin:'-25% 0px -60% 0px'});
     sections.forEach(s=>io.observe(s));
   }
+})();
+</script>
+
+<script id="horizontal-table-scroll-js">
+(function(){
+  const card=document.getElementById('roads-section');
+  if(!card) return;
+  const wrap=card.querySelector('.table-wrap');
+  const left=document.getElementById('tableScrollLeft');
+  const right=document.getElementById('tableScrollRight');
+  if(!wrap) return;
+
+  const step=520;
+  if(left) left.addEventListener('click',()=>wrap.scrollBy({left:-step,behavior:'smooth'}));
+  if(right) right.addEventListener('click',()=>wrap.scrollBy({left:step,behavior:'smooth'}));
 })();
 </script>
 </body></html>
