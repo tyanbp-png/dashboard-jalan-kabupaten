@@ -582,7 +582,24 @@ function render(){
         let x=rows.find(a=>a.no_ruas===String(f.properties?.no_ruas||'').trim());
         if(x){
           l.on('click',function(e){
-            activeGooglePoint=e.latlng;
+            // Simpan TEPAT titik pada garis yang diklik untuk ruas ini.
+            // Koordinat ini kemudian ditempelkan ke tombol Google Maps
+            // pada popup ruas yang sedang dibuka.
+            l._clickedGooglePoint = {
+              lat: Number(e.latlng.lat),
+              lng: Number(e.latlng.lng)
+            };
+            activeGooglePoint = l._clickedGooglePoint;
+          });
+
+          l.on('popupopen',function(){
+            const btn = l.getPopup()?.getElement()?.querySelector('.popup-gmaps-btn');
+            const p = l._clickedGooglePoint || activeGooglePoint;
+            if(btn && p){
+              btn.dataset.lat = p.lat.toFixed(6);
+              btn.dataset.lng = p.lng.toFixed(6);
+              btn.title = 'Buka Google Maps tepat pada titik ruas yang diklik';
+            }
           });
 
           // Label hanya muncul saat ruas dipilih/di-hover agar tidak saling bertumpuk.
@@ -647,7 +664,7 @@ function render(){
                 </table>
               </div>
               <div class="popup-actions" style="margin-top:10px">
-                <button type="button" class="popup-gmaps-btn">📍 Buka Google Maps</button>
+                <button type="button" class="popup-gmaps-btn" title="Buka Google Maps tepat pada titik ruas yang diklik">📍 Buka Google Maps di Titik Ini</button>
               </div>
             </div>`);
         }
@@ -750,11 +767,14 @@ document.addEventListener('click', function(e){
   e.preventDefault();
   e.stopPropagation();
 
-  // Open Google Maps only after the user explicitly presses the button.
-  const p=activeGooglePoint;
-  if(!p) return;
+  // Ambil koordinat dari popup ruas yang BARU saja diklik.
+  // Dengan cara ini posisi tidak pernah diambil secara acak/di tengah trase.
+  const lat=Number(btn.dataset.lat);
+  const lng=Number(btn.dataset.lng);
+  if(!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+
   const url='https://www.google.com/maps/search/?api=1&query='+
-            encodeURIComponent(Number(p.lat).toFixed(6)+','+Number(p.lng).toFixed(6));
+            encodeURIComponent(lat.toFixed(6)+','+lng.toFixed(6));
   window.open(url,'_blank','noopener,noreferrer');
 }, true);
 </script>
