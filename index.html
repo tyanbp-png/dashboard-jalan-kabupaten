@@ -290,6 +290,122 @@ body{
   }
 }
 </style>
+
+<style id="sticky-road-table-header">
+/* Header tabel tetap menempel saat isi Daftar Ruas di-scroll */
+#roads-section .table-wrap{
+  position:relative !important;
+}
+
+/* Sticky hanya pada header, bukan seluruh tabel */
+#roads-section .table-wrap table thead th{
+  position:sticky !important;
+  top:0 !important;
+  z-index:20 !important;
+  background:#e6f1f7 !important;
+  box-shadow:0 1px 0 #cbdde7, 0 2px 4px rgba(24,61,82,.05);
+}
+
+/* Supaya header tidak transparan saat baris di bawahnya bergerak */
+#roads-section .table-wrap table thead{
+  position:relative;
+  z-index:20;
+}
+
+/* Saat filter sticky berada di atas, header tabel tetap aman */
+@media(min-width:901px){
+  #roads-section .table-wrap table thead th{
+    top:0 !important;
+  }
+}
+</style>
+
+<style id="fix-sticky-road-header">
+/* Perbaikan: hanya .table-wrap yang menjadi area scroll.
+   Parent .table tidak boleh menjadi scroll container karena membuat
+   header tabel ikut hilang. */
+#roads-section > .table{
+  overflow:visible !important;
+  max-height:none !important;
+}
+
+/* Header Daftar Ruas benar-benar menempel pada bagian atas
+   area tabel ketika baris digulir. */
+#roads-section .table-wrap{
+  max-height:550px !important;
+  overflow:auto !important;
+  position:relative !important;
+}
+
+#roads-section .table-wrap .excel-table{
+  border-collapse:separate !important;
+  border-spacing:0 !important;
+}
+
+#roads-section .table-wrap .excel-table thead th{
+  position:sticky !important;
+  top:0 !important;
+  z-index:50 !important;
+  background:linear-gradient(180deg,#eaf4fa,#dcecf5) !important;
+  box-shadow:0 2px 4px rgba(24,61,82,.10) !important;
+}
+
+/* Untuk header bertingkat 3 baris, baris kedua dan ketiga
+   tetap berada tepat di bawah header pertama. */
+#roads-section .table-wrap .excel-table thead tr:nth-child(1) th{
+  top:0 !important;
+}
+#roads-section .table-wrap .excel-table thead tr:nth-child(2) th{
+  top:34px !important;
+}
+#roads-section .table-wrap .excel-table thead tr:nth-child(3) th{
+  top:68px !important;
+}
+</style>
+
+<style id="fix-sticky-header-gap">
+#roads-section .table-wrap .excel-table{
+  border-collapse:separate !important;
+  border-spacing:0 !important;
+}
+#roads-section .table-wrap .excel-table thead tr:nth-child(1) th{
+  height:42px !important;
+  min-height:42px !important;
+  padding:8px 10px !important;
+  box-sizing:border-box !important;
+}
+#roads-section .table-wrap .excel-table thead tr:nth-child(2) th{
+  height:42px !important;
+  min-height:42px !important;
+  padding:8px 10px !important;
+  box-sizing:border-box !important;
+}
+#roads-section .table-wrap .excel-table thead tr:nth-child(3) th{
+  height:42px !important;
+  min-height:42px !important;
+  padding:8px 10px !important;
+  box-sizing:border-box !important;
+}
+
+/* Posisi sticky tanpa celah putih di antara baris header */
+#roads-section .table-wrap .excel-table thead tr:nth-child(1) th{
+  top:0 !important;
+}
+#roads-section .table-wrap .excel-table thead tr:nth-child(2) th{
+  top:42px !important;
+}
+#roads-section .table-wrap .excel-table thead tr:nth-child(3) th{
+  top:84px !important;
+}
+
+/* Hilangkan kemungkinan border/gap yang terlihat seperti celah */
+#roads-section .table-wrap .excel-table thead th{
+  margin:0 !important;
+  vertical-align:middle !important;
+  line-height:1.15 !important;
+  border-bottom:1px solid #cbdde7 !important;
+}
+</style>
 </head>
 <body>
 <aside class="side-nav" id="sideNav">
